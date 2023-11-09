@@ -2,3 +2,9 @@ Relevant links for this project
 
 * V3 Factory
 https://docs.sushi.com/docs/Products/V3%20AMM/Core/Contracts/V3Factory
+
+* Events
+https://docs.sushi.com/docs/Products/V3%20AMM/Core/Contracts/V3Pool
+
+* History
+https://beincrypto.com/a-guide-and-short-history-of-sushiswap/
