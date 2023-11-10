@@ -11,24 +11,13 @@ message Contract {
     string timestamp = 2;
 }
 
-message Transfers {
-  repeated Transfer transfers = 1;
+message Pools {
+  repeated Pool pools = 1;
 }
 
-message Transfer {
-  string from = 1;
-  string to = 2;
-  string token_id = 3;
-  string tx_hash = 4;
+message Pool {
+  string token_0 = 1;
+  string token_1 = 2;
+  string pool = 3;
 }
 
-message Approval {
-  string owner = 1;
-  string approved = 2;
-  string token_id = 3;
-  string tx_hash = 4;
-}
-
-message Approvals {
-  repeated Approval approvals = 1;
-}
