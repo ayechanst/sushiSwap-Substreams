@@ -15,38 +15,18 @@ pub struct Contract {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Transfers {
+pub struct Pools {
     #[prost(message, repeated, tag="1")]
-    pub transfers: ::prost::alloc::vec::Vec<Transfer>,
+    pub pools: ::prost::alloc::vec::Vec<Pool>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Transfer {
+pub struct Pool {
     #[prost(string, tag="1")]
-    pub from: ::prost::alloc::string::String,
+    pub token_0: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
-    pub to: ::prost::alloc::string::String,
+    pub token_1: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
-    pub token_id: ::prost::alloc::string::String,
-    #[prost(string, tag="4")]
-    pub tx_hash: ::prost::alloc::string::String,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Approval {
-    #[prost(string, tag="1")]
-    pub owner: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub approved: ::prost::alloc::string::String,
-    #[prost(string, tag="3")]
-    pub token_id: ::prost::alloc::string::String,
-    #[prost(string, tag="4")]
-    pub tx_hash: ::prost::alloc::string::String,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Approvals {
-    #[prost(message, repeated, tag="1")]
-    pub approvals: ::prost::alloc::vec::Vec<Approval>,
+    pub pool: ::prost::alloc::string::String,
 }
 // @@protoc_insertion_point(module)

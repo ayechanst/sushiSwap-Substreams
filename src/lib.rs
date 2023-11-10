@@ -4,25 +4,27 @@ mod uniswapv3factory;
 mod helpers;
 mod pb;
 
-use pb::schema::{Approval, Approvals, Transfer, Transfers};
+use pb::schema::{Pool, Pools};
 use substreams::pb::substreams::Clock;
 use substreams_entity_change::{pb::entity::EntityChanges, tables::Tables};
 use substreams_ethereum::{pb::eth, Event};
 
 use helpers::*;
+use uniswapv3factory::events::PoolCreated;
 
+// from substreams scaffolding
 // use erc721::events::{Approval as ApprovalEvent, Transfer as TransferEvent};
 
-pub const ADDRESS: &str = "";
+pub const ADDRESS: &str = "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F";
 const START_BLOCK: u64 = 12287507;
 
 #[substreams::handlers::map]
-fn map_pools_created(block: eth::v2::Block) -> Result<Transfers, substreams::errors::Error> {
-    let transfers = block
+fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors::Error> {
+    let pools_created = block
         .logs()
         .filter_map(|log| {
             if format_hex(log.address()) == ADDRESS.to_lowercase() {
-                if let Some(transfer) = TransferEvent::match_and_decode(log) {
+                if let Some(transfer) = PoolCreated::match_and_decode(log) {
                     Some((transfer, format_hex(&log.receipt.transaction.hash)))
                 } else {
                     None
@@ -31,15 +33,14 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Transfers, substreams::err
                 None
             }
         })
-        .map(|(transfer, hash)| Transfer {
-            from: format_hex(&transfer.from),
-            to: format_hex(&transfer.to),
-            token_id: transfer.token_id.to_string(),
-            tx_hash: hash,
+        .map(|(pool_created, hash)| Pool {
+            token_0: format_hex(&pool_created.token0),
+            token_1: format_hex(&pool_created.token1),
+            pool: pool_created.pool.to_string(),
         })
-        .collect::<Vec<Transfer>>();
+        .collect::<Vec<Pool>>();
 
-    Ok(Transfers { transfers })
+    Ok(Pools { pools })
 }
 
 #[substreams::handlers::map]
