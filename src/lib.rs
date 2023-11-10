@@ -1,5 +1,5 @@
-#[path = "./abi/erc721.rs"]
-mod erc721;
+#[path = "./abi/uniswapv3factory.rs"]
+mod uniswapv3factory;
 
 mod helpers;
 mod pb;
@@ -11,13 +11,13 @@ use substreams_ethereum::{pb::eth, Event};
 
 use helpers::*;
 
-use erc721::events::{Approval as ApprovalEvent, Transfer as TransferEvent};
+// use erc721::events::{Approval as ApprovalEvent, Transfer as TransferEvent};
 
-pub const ADDRESS: &str = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D";
+pub const ADDRESS: &str = "";
 const START_BLOCK: u64 = 12287507;
 
 #[substreams::handlers::map]
-fn map_transfers(block: eth::v2::Block) -> Result<Transfers, substreams::errors::Error> {
+fn map_pools_created(block: eth::v2::Block) -> Result<Transfers, substreams::errors::Error> {
     let transfers = block
         .logs()
         .filter_map(|log| {
