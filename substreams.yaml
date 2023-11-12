@@ -19,28 +19,20 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
-  - name: map_transfers
+  - name: map_pools_created
     kind: map
     initialBlock: 12287507
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:schema.Transfers
+      type: proto:schema.Pools
 
-  - name: map_approvals
-    kind: map
-    initialBlock: 12287507
-    inputs:
-      - source: sf.ethereum.type.v2.Block
-    output:
-      type: proto:schema.Approvals
-
-  - name: graph_out
-    kind: map
-    initialBlock: 12287507
-    inputs:
-      - source: sf.substreams.v1.Clock
-      - map: map_transfers
-      - map: map_approvals
-    output:
-      type: proto:substreams.entity.v1.EntityChanges
+  # - name: graph_out
+  #   kind: map
+  #   initialBlock: 12287507
+  #   inputs:
+  #     - source: sf.substreams.v1.Clock
+  #     - map: map_transfers
+  #     - map: map_approvals
+  #   output:
+  #     type: proto:substreams.entity.v1.EntityChanges
