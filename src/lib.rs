@@ -6,6 +6,7 @@ mod pb;
 
 use pb::schema::{Pool, Pools};
 use substreams_ethereum::{pb::eth, Event};
+// use substreams_ethereum::pb::eth;
 
 use helpers::*;
 use uniswapv3factory::events::PoolCreated;
@@ -18,7 +19,7 @@ use uniswapv3factory::events::PoolCreated;
 // use substreams_entity_change::{pb::entity::EntityChanges, tables::Tables};
 
 pub const ADDRESS: &str = "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F";
-const START_BLOCK: u64 = 18532170;
+// const START_BLOCK: u64 = 18532170;
 
 #[substreams::handlers::map]
 fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors::Error> {
@@ -35,7 +36,7 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
                 None
             }
         })
-        .map(|(pool_created, hash)| Pool {
+        .map(|(pool_created, _hash)| Pool {
             token_0: format_hex(&pool_created.token0),
             token_1: format_hex(&pool_created.token1),
             pool: format_hex(&pool_created.pool),
