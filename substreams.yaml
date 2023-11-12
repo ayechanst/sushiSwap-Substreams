@@ -27,6 +27,11 @@ modules:
     output:
       type: proto:schema.Pools
 
+  - name: store_pools_created
+    kind: store
+    inputs:
+      - source: Pools
+
   # - name: graph_out
   #   kind: map
   #   initialBlock: 12287507
