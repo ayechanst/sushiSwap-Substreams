@@ -5,6 +5,7 @@ mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools};
+use substreams::store::{StoreSetProto, StoreSet}; // for store pools
 use substreams_ethereum::{pb::eth, Event};
 // use substreams_ethereum::pb::eth;
 
@@ -17,6 +18,7 @@ use uniswapv3factory::events::PoolCreated;
 // for db_out or graph_out
 // use substreams::pb::substreams::Clock;
 // use substreams_entity_change::{pb::entity::EntityChanges, tables::Tables};
+//
 
 pub const ADDRESS: &str = "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F";
 // const START_BLOCK: u64 = 18532170;
@@ -44,6 +46,13 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
         .collect::<Vec<Pool>>();
 
     Ok(Pools { pools })
+}
+
+#[substreams::handlers::store]
+fn store_pools_created(pools_created: Pools, store: StoreSetProto<Pools>) {
+    for pool in pools.pools {
+        store.set(0, key, value)
+    }
 }
 
 
