@@ -48,6 +48,9 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
     Ok(Pools { pools })
 }
 
+#[substreams::handlers::map]
+
+
 #[substreams::handlers::store]
 fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
     for pool in pools.pools {
@@ -56,12 +59,14 @@ fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
     }
 }
 
-#[substreams::handlers::map]
-fn map_pools_transactions(pools: Pools) {
-    for pool in pools.pools {
-        let pool_address = pool.pool;
-    }
-}
+// #[substreams::handlers::map]
+// fn map_pools_transactions(block: eth::v2::Block, pools: Pools) {
+//     let value_in_pools = block
+//         .logs()
+//         .filter_map(|log| {
+//             if format_hex(log.address()) == pools.pools
+//         })
+// }
 
 // #[substreams::handlers::map]
 // pub fn graph_out(
