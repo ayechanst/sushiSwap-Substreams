@@ -29,8 +29,12 @@ modules:
 
   - name: store_pools_created
     kind: store
+    initialBlock: 12287507
+    updatePolicy: proto: { Pools }
+    valueType: set
     inputs:
-      - source: Pools
+      - map: map_pools_created
+
 
   # - name: graph_out
   #   kind: map
