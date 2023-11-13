@@ -11,3 +11,7 @@ https://docs.sushi.com/docs/Products/V3%20AMM/Core/Contracts/V3Pool
 https://beincrypto.com/a-guide-and-short-history-of-sushiswap/
 
 * Rust Docs
+OG substreams ethereum core
+https://docs.rs/substreams-ethereum-core/latest/substreams_ethereum_core/
+New rust docs with other stuff
+https://docs.rs/substreams/latest/substreams/index.html

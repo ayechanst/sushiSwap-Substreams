@@ -49,6 +49,7 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
 }
 
 #[substreams::handlers::map]
+fn map_tx_with_pools
 
 
 #[substreams::handlers::store]
