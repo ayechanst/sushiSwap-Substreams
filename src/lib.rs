@@ -4,7 +4,7 @@ mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools};
-use substreams::store::{StoreSetProto, StoreSet}; // for store pools
+use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
 use substreams::store::StoreNew; // for store pools
 use substreams_ethereum::{pb::eth, Event};
 // use substreams_ethereum::pb::eth;
@@ -56,6 +56,12 @@ fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
     }
 }
 
+#[substreams::handlers::map]
+fn map_pools_transactions(pools: Pools) {
+    for pool in pools.pools {
+        let pool_address = pool.pool;
+    }
+}
 
 // #[substreams::handlers::map]
 // pub fn graph_out(
