@@ -30,8 +30,8 @@ modules:
   - name: store_pools_created
     kind: store
     initialBlock: 12287507
-    updatePolicy: proto: { Pools }
-    valueType: set
+    updatePolicy: set
+    valueType: proto:{Pools}
     inputs:
       - map: map_pools_created
 
