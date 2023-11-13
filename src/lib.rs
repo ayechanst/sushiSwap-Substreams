@@ -1,11 +1,11 @@
 #[path = "./abi/uniswapv3factory.rs"]
 mod uniswapv3factory;
-
 mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools};
 use substreams::store::{StoreSetProto, StoreSet}; // for store pools
+use substreams::store::StoreNew; // for store pools
 use substreams_ethereum::{pb::eth, Event};
 // use substreams_ethereum::pb::eth;
 
@@ -49,9 +49,10 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
 }
 
 #[substreams::handlers::store]
-fn store_pools_created(pools: Pools, store: StoreSetProto<Pools>) {
+fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
     for pool in pools.pools {
-        store.set(0, "pool", &pools)
+        let key = format!("pool:{}", pool.pool);
+        store.set(0, &key, &pool)
     }
 }
 
