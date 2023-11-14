@@ -33,7 +33,7 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
         .filter_map(|log| {
             if format_hex(log.address()) == ADDRESS.to_lowercase() {
                 if let Some(transfer) = PoolCreated::match_and_decode(log) {
-                    Some((transfer, format_hex(&log.receipt.transaction.hash)))
+                    Some(transfer)
                 } else {
                     None
                 }
@@ -41,8 +41,7 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
                 None
             }
         })
-        // might want to add a topics field
-        .map(|(pool_created, _hash)| Pool {
+        .map(|pool_created| Pool {
             token_0: format_hex(&pool_created.token0),
             token_1: format_hex(&pool_created.token1),
             pool: format_hex(&pool_created.pool),
@@ -63,7 +62,9 @@ fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
                     if topic_0 == TRANSFER_EVENT_SIGNATURE {
                         if let Some(topic_2) = topics.get(2) {
                             if topic_2 == pools.pools.pool {
-                                Some(value)
+                                let pool_with_weth = pools.pools.pool;
+                                // maybe another if let?
+                                // Some(pools.pools.pool)
                             }
                         } else {
                             None
@@ -76,7 +77,7 @@ fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
                 None
             }
         })
-        .map()
+        .map(|pool_with_weth|)
 }
 
 

@@ -21,3 +21,11 @@ message Pool {
   string pool = 3;
 }
 
+message WrappedEthPools {
+  repeated WrappedEthPool wrappedEthPools = 1;
+}
+
+message WrappedEthPool {
+  string poolAddress = 1;
+  string wrappedEthAmount = 2;
+}
