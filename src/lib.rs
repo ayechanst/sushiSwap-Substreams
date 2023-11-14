@@ -22,6 +22,7 @@ use uniswapv3factory::events::PoolCreated;
 //
 
 pub const ADDRESS: &str = "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F";
+pub const WRAPPED_ETH_ADDRESS: &str = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 // const START_BLOCK: u64 = 18532170;
 
 #[substreams::handlers::map]
@@ -54,9 +55,9 @@ fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
     let value = block
         .logs()
         .filter_map(|log| {
-            if format_hex(log.address() == pools.pools.pool) {
-                if let Some(thing) = PoolCreated::match_and_decode(log) {
-                    Some((thing, fromat_hex(&log.receipt.transaction.hash)))
+            if format_hex(log.address() == WRAPPED_ETH_ADDRESS) {
+                if log.topics() == pools.pools { // fix this
+                    Some((sushiPool, format_hex(&log.receipt.transaction.hash)))
                 } else {
                     None
                 }
