@@ -61,7 +61,13 @@ fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
                 let topics = log.topics();
                 if let Some(topic_0) = topics.get(0) {
                     if topic_0 == TRANSFER_EVENT_SIGNATURE {
-                        // do something
+                        if let Some(topic_2) = topics.get(2) {
+                            if topic_2 == pools.pools.pool {
+                                Some(value)
+                            }
+                        } else {
+                            None
+                        }
                     }
                 } else {
                     None
