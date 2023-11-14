@@ -4,7 +4,8 @@ mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools};
-use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
+// use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
+use substreams::store::{StoreSetProto, StoreSet}; // for store pools minus StoreGetProto
 use substreams::store::StoreNew; // for store pools
 use substreams_ethereum::{pb::eth, Event};
 // use substreams_ethereum::pb::eth;
@@ -49,7 +50,22 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
 }
 
 #[substreams::handlers::map]
-fn map_tx_with_pools
+fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
+    let value = block
+        .logs()
+        .filter_map(|log| {
+            if format_hex(log.address() == pools.pools.pool) {
+                if let Some(thing) = PoolCreated::match_and_decode(log) {
+                    Some((thing, fromat_hex(&log.receipt.transaction.hash)))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+        .map()
+}
 
 
 #[substreams::handlers::store]
