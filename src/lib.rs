@@ -23,6 +23,7 @@ use uniswapv3factory::events::PoolCreated;
 
 pub const ADDRESS: &str = "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F";
 pub const WRAPPED_ETH_ADDRESS: &str = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+pub const TRANSFER_EVENT_SIGNATURE: &str = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 // const START_BLOCK: u64 = 18532170;
 
 #[substreams::handlers::map]
@@ -57,9 +58,11 @@ fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
         .logs()
         .filter_map(|log| {
             if format_hex(log.address() == WRAPPED_ETH_ADDRESS) {
-                // log.topic() returns Vec<Vec<u8>>
-                if log.topics() == pools.pools { // fix this, pools.pools should be a topic
-                    Some((sushiPool, format_hex(&log.receipt.transaction.hash)))
+                let topics = log.topics();
+                if let Some(topic_0) = topics.get(0) {
+                    if topic_0 == TRANSFER_EVENT_SIGNATURE {
+                        // do something
+                    }
                 } else {
                     None
                 }
