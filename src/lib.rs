@@ -40,6 +40,7 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
                 None
             }
         })
+        // might want to add a topics field
         .map(|(pool_created, _hash)| Pool {
             token_0: format_hex(&pool_created.token0),
             token_1: format_hex(&pool_created.token1),
@@ -56,7 +57,8 @@ fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
         .logs()
         .filter_map(|log| {
             if format_hex(log.address() == WRAPPED_ETH_ADDRESS) {
-                if log.topics() == pools.pools { // fix this
+                // log.topic() returns Vec<Vec<u8>>
+                if log.topics() == pools.pools { // fix this, pools.pools should be a topic
                     Some((sushiPool, format_hex(&log.receipt.transaction.hash)))
                 } else {
                     None
