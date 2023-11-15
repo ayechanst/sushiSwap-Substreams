@@ -4,6 +4,7 @@ mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools};
+use crate::pb::schema::{SushiWethPool, SushiWethPools};
 // use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
 use substreams::store::{StoreSetProto, StoreSet}; // for store pools minus StoreGetProto
 use substreams::store::StoreNew; // for store pools
@@ -31,7 +32,9 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
     let pools = block
         .logs()
         .filter_map(|log| {
+            // this is the filtering part
             if format_hex(log.address()) == ADDRESS.to_lowercase() {
+                // this is the mapping part
                 if let Some(pool_creation) = PoolCreated::match_and_decode(log) {
                     Some(pool_creation)
                 } else {
@@ -41,6 +44,7 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
                 None
             }
         })
+        // this is a different map doing something else
         .map(|pool_created| Pool {
             token_0: format_hex(&pool_created.token0),
             token_1: format_hex(&pool_created.token1),
@@ -57,7 +61,7 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
         .logs()
         .filter_map(|log| {
             // if the log from the block is coming from the wrapped eth address
-            if format_hex(log.address() == WRAPPED_ETH_ADDRESS) {
+            if format_hex(log.address()) == WRAPPED_ETH_ADDRESS.to_lowercase() {
                 // then get the topics from that log
                 let topics = log.topics();
                 if let Some(topic_0) = topics.get(0) {
@@ -66,9 +70,11 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                         if let Some(topic_2) = topics.get(2) {
                             // then if topic_2 from that log is going to the
                             // address of my sushi-pool
-                            if format_hex(&topic_2) == &pools.pools.pool {
-                                // do what?
-                            }
+                            let sushi_pools = pools.pools.pool;
+                            let sushi_pools_address = sushi_pools[2];
+                                if format_hex(&topic_2) == format_hex(sushi_pool_address) {
+                                    // something
+                                }
                         } else {
                             None
                         }
@@ -82,12 +88,12 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
         })
         .map(|pool_with_weth| SushiWethPool {
             pool: format_hex(&pool_with_weth.pools.pool),
-            topic_2: format_hex(&pool_with_weth.),
+            topic_2: format_hex(&topic_2),
             wethAmount: "0",
         })
         .collect::<Vec<SushiWethPool>>();
 
-    Ok(SushiWethPool { sushi_weth_pools })
+    Ok(SushiWethPools { sushi_weth_pools })
 }
 
 

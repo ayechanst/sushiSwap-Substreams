@@ -15,3 +15,9 @@ OG substreams ethereum core
 https://docs.rs/substreams-ethereum-core/latest/substreams_ethereum_core/
 New rust docs with other stuff
 https://docs.rs/substreams/latest/substreams/index.html
+
+
+* English Explantion
+** map_pool_transactions what is it doing?
+This map module takes in blocks and the pools protobuf. It takes the blocks and
+looks at the logs. If the log on the block comes from from the wrapped eth token
