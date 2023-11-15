@@ -29,4 +29,20 @@ pub struct Pool {
     #[prost(string, tag="3")]
     pub pool: ::prost::alloc::string::String,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SushiWethPools {
+    #[prost(message, repeated, tag="1")]
+    pub sushi_weth_pools: ::prost::alloc::vec::Vec<SushiWethPool>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SushiWethPool {
+    #[prost(string, tag="1")]
+    pub pool: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub topic_2: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub weth_amount: ::prost::alloc::string::String,
+}
 // @@protoc_insertion_point(module)
