@@ -71,13 +71,21 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                             // then if topic_2 from that log is going to the address of my sushi-pool
                             let sushi_pools = &pools.pools;
                             let sushi_pool = &sushi_pools[0];
-                            let sushi_pool_address = sushi_pool.pool;
-                                if format_hex(&topic_2) == sushi_pool_address {
-                                    let win = "yes";
+                            let sushi_pool_address = &sushi_pool.pool;
+                                if format_hex(&topic_2) == &sushi_pool_address {
+                                    return Some(SushiWethPool {
+                                        pool: sushi_pool_address,
+                                        topic_2: format_hex(topic_2),
+                                        weth_amount: String::from("0"),
+                                    })
+                                } else {
+                                    None
                                 }
                         } else {
                             None
                         }
+                    } else {
+                        None
                     }
                 } else {
                     None
@@ -85,11 +93,11 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
             } else {
                 None
             }
-        })
-        .map(|pool_with_weth| SushiWethPool {
-            pool: format_hex(&pool_with_weth.pools.pool),
-            topic_2: format_hex(&topic_2),
-            wethAmount: "0",
+        // })
+        // .map(|pool_with_weth| SushiWethPool {
+        //     pool: format_hex(&pool_with_weth.pools.pool),
+        //     topic_2: format_hex(&topic_2),
+        //     wethAmount: "0",
         })
         .collect::<Vec<SushiWethPool>>();
 
