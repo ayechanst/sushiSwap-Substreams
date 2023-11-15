@@ -32,8 +32,8 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
         .logs()
         .filter_map(|log| {
             if format_hex(log.address()) == ADDRESS.to_lowercase() {
-                if let Some(transfer) = PoolCreated::match_and_decode(log) {
-                    Some(transfer)
+                if let Some(pool_creation) = PoolCreated::match_and_decode(log) {
+                    Some(pool_creation)
                 } else {
                     None
                 }
@@ -56,13 +56,14 @@ fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
     let value = block
         .logs()
         .filter_map(|log| {
+            // if the log from the block is coming from the wrapped eth address
             if format_hex(log.address() == WRAPPED_ETH_ADDRESS) {
                 let topics = log.topics();
                 if let Some(topic_0) = topics.get(0) {
-                    if topic_0 == TRANSFER_EVENT_SIGNATURE {
+                    if format_hex(&topic_0) == TRANSFER_EVENT_SIGNATURE {
                         if let Some(topic_2) = topics.get(2) {
-                            if topic_2 == pools.pools.pool {
-                                let pool_with_weth = pools.pools.pool;
+                            if format_hex(&topic_2) == &pools.pools.pool {
+                                // let pool_with_weth = pools.pools.pool;
                                 // maybe another if let?
                                 // Some(pools.pools.pool)
                             }

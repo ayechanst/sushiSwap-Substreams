@@ -21,11 +21,12 @@ message Pool {
   string pool = 3;
 }
 
-message WrappedEthPools {
-  repeated WrappedEthPool wrappedEthPools = 1;
+message SushiWethPools {
+  repeated SushiWethPool sushiWethPools = 1;
 }
 
-message WrappedEthPool {
-  string poolAddress = 1;
-  string wrappedEthAmount = 2;
+message SushiWethPool {
+  string pool = 1;
+  string topic_2 = 2;
+  string wethAmount = 3;
 }
