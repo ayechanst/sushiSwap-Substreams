@@ -68,12 +68,12 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                     // if topic_0 from that log is a transfer event
                     if format_hex(&topic_0) == TRANSFER_EVENT_SIGNATURE {
                         if let Some(topic_2) = topics.get(2) {
-                            // then if topic_2 from that log is going to the
-                            // address of my sushi-pool
-                            let sushi_pools = pools.pools.pool;
-                            let sushi_pools_address = sushi_pools[2];
-                                if format_hex(&topic_2) == format_hex(sushi_pool_address) {
-                                    // something
+                            // then if topic_2 from that log is going to the address of my sushi-pool
+                            let sushi_pools = &pools.pools;
+                            let sushi_pool = &sushi_pools[0];
+                            let sushi_pool_address = sushi_pool.pool;
+                                if format_hex(&topic_2) == sushi_pool_address {
+                                    let win = "yes";
                                 }
                         } else {
                             None
