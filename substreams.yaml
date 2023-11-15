@@ -27,6 +27,15 @@ modules:
     output:
       type: proto:schema.Pools
 
+  - name: map_sushi_weth_pools
+    kind: map
+    initialBlock: 12287507
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+      - map: map_pools_created
+    output:
+      type: proto:schema.SushiWethPools
+
   - name: store_pools_created
     kind: store
     initialBlock: 12287507
@@ -34,7 +43,6 @@ modules:
     valueType: proto:{Pools}
     inputs:
       - map: map_pools_created
-
 
   # - name: graph_out
   #   kind: map

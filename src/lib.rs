@@ -52,20 +52,22 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
 }
 
 #[substreams::handlers::map]
-fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
-    let value = block
+fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWethPools, substreams::errors::Error> {
+    let sushi_weth_pools = block
         .logs()
         .filter_map(|log| {
             // if the log from the block is coming from the wrapped eth address
             if format_hex(log.address() == WRAPPED_ETH_ADDRESS) {
+                // then get the topics from that log
                 let topics = log.topics();
                 if let Some(topic_0) = topics.get(0) {
+                    // if topic_0 from that log is a transfer event
                     if format_hex(&topic_0) == TRANSFER_EVENT_SIGNATURE {
                         if let Some(topic_2) = topics.get(2) {
+                            // then if topic_2 from that log is going to the
+                            // address of my sushi-pool
                             if format_hex(&topic_2) == &pools.pools.pool {
-                                // let pool_with_weth = pools.pools.pool;
-                                // maybe another if let?
-                                // Some(pools.pools.pool)
+                                // do what?
                             }
                         } else {
                             None
@@ -78,7 +80,14 @@ fn map_pool_transactions(block: eth::v2::Block, pools: Pools) {
                 None
             }
         })
-        .map(|pool_with_weth|)
+        .map(|pool_with_weth| SushiWethPool {
+            pool: format_hex(&pool_with_weth.pools.pool),
+            topic_2: format_hex(&pool_with_weth.),
+            wethAmount: "0",
+        })
+        .collect::<Vec<SushiWethPool>>();
+
+    Ok(SushiWethPool { sushi_weth_pools })
 }
 
 
