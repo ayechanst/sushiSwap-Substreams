@@ -70,17 +70,20 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                         if let Some(topic_2) = topics.get(2) {
                             // then if topic_2 from that log is going to the address of my sushi-pool
                             let sushi_pools = &pools.pools;
-                            let sushi_pool = &sushi_pools[0];
-                            let sushi_pool_address = &sushi_pool.pool;
-                                if format_hex(topic_2) == *sushi_pool_address {
-                                    return Some(SushiWethPool {
-                                        pool: sushi_pool_address.to_string(),
-                                        topic_2: format_hex(topic_2),
-                                        weth_amount: String::from("0"),
-                                    })
-                                } else {
-                                    None
-                                }
+                            if let Some(sushi_pool) = &sushi_pools.get(0) {
+                                let sushi_pool_address = &sushi_pool.pool;
+                                    if format_hex(topic_2) == *sushi_pool_address {
+                                        Some(SushiWethPool {
+                                            pool: sushi_pool_address.to_string(),
+                                            topic_2: format_hex(topic_2),
+                                            weth_amount: String::from("0"),
+                                        })
+                                    } else {
+                                        None
+                                    }
+                            } else {
+                                None
+                            }
                         } else {
                             None
                         }
