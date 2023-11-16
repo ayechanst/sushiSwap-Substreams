@@ -61,38 +61,29 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
         .logs()
         .filter_map(|log| {
             // if the log from the block is coming from the wrapped eth address
-            if format_hex(log.address()) == WRAPPED_ETH_ADDRESS.to_lowercase() {
+            if format_hex(log.address()) == WRAPPED_ETH_ADDRESS.to_lowercase() && log.log.topics.len() == 3 {
+                let topic_0 = format_hex(&log.log.topics[0]);
                 // then get the topics from that log
-                let topics = log.topics();
-                if let Some(topic_0) = topics.get(0) {
-                    // if topic_0 from that log is a transfer event
-                    if format_hex(topic_0) == TRANSFER_EVENT_SIGNATURE {
-                        if let Some(topic_2) = topics.get(2) {
+                    if topic_0 == TRANSFER_EVENT_SIGNATURE {
+                        let topic_2 = format_hex(&log.log.topics[2]);
                             // then if topic_2 from that log is going to the address of my sushi-pool
-                            let sushi_pools = &pools.pools;
-                            if let Some(sushi_pool) = &sushi_pools.get(0) {
-                                let sushi_pool_address = &sushi_pool.pool;
-                                    if format_hex(topic_2) == *sushi_pool_address {
-                                        Some(SushiWethPool {
-                                            pool: sushi_pool_address.to_string(),
-                                            topic_2: format_hex(topic_2),
-                                            weth_amount: String::from("0"),
-                                        })
-                                    } else {
-                                        None
-                                    }
-                            } else {
-                                None
-                            }
-                        } else {
-                            None
+                        let sushi_pools = &pools.pools;
+                        if sushi_pools.len() > 1 {
+                            let sushi_pool = sushi_pools[0];
+                            let sushi_pool_address = &sushi_pool.pool;
+                                if topic_2 == *sushi_pool_address {
+                                    Some(SushiWethPool {
+                                        pool: sushi_pool_address.to_string(),
+                                        topic_2,
+                                        weth_amount: String::from("0"),
+                                    })
+                                } else {
+                                    None
+                                }
                         }
                     } else {
                         None
                     }
-                } else {
-                    None
-                }
             } else {
                 None
             }
