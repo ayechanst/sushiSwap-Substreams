@@ -67,7 +67,9 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                 let topic_0 = format_hex(&log.log.topics[0]);
                 // then get the topics from that log
                     if topic_0 == TRANSFER_EVENT_SIGNATURE {
-                        let topic_2 = format_hex(&log.log.topics[2]);
+                        let padded_topic_2 = &log.log.topics[2];
+                        let topic_2 = format_hex(&padded_topic_2[24..]);
+                        substreams::log::info!("topic 2: {:?}", topic_2);
                             // then if topic_2 from that log is going to the address of my sushi-pool
                         let sushi_pools = &pools.pools;
                         // the problem is with the line above, if the block has no sushi pools it fails
