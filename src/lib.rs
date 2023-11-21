@@ -63,17 +63,13 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
         .filter_map(|log| {
             // if the log from the block is coming from the wrapped eth address
             if format_hex(log.address()) == WRAPPED_ETH_ADDRESS.to_lowercase() {
-                // substreams::log::info!("WETH DETECTED");
-            // if format_hex(log.address()) == WRAPPED_ETH_ADDRESS.to_lowercase() && log.log.topics.len() == 3 {
                 let topic_0 = format_hex(&log.log.topics[0]);
                 // then get the topics from that log
                     if topic_0 == TRANSFER_EVENT_SIGNATURE {
                         let padded_topic_2 = &log.log.topics[2];
                         let topic_2 = format_hex(&padded_topic_2[12..]);
-                        // substreams::log::info!("topic 2: {:?}", topic_2);
-                            // then if topic_2 from that log is going to the address of my sushi-pool
+                        // then if topic_2 from that log is going to the address of my sushi-pool
                         let sushi_pools = &pools.pools;
-                        // the problem is with the line above, if the block has no sushi pools it fails
                         if !sushi_pools.is_empty() {
                             let sushi_pool = &sushi_pools[0];
                             let sushi_pool_address = &sushi_pool.pool;
