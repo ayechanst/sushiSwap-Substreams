@@ -29,6 +29,7 @@ pub const TRANSFER_EVENT_SIGNATURE: &str = "0xddf252ad1be2c89b69c2b068fc378daa95
 
 #[substreams::handlers::map]
 fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors::Error> {
+    // make sure this is grabbing the right pools
     let pools = block
         .logs()
         .filter_map(|log| {
@@ -62,18 +63,18 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
         .filter_map(|log| {
             // if the log from the block is coming from the wrapped eth address
             if format_hex(log.address()) == WRAPPED_ETH_ADDRESS.to_lowercase() {
-                substreams::log::info!("WETH DETECTED");
+                // substreams::log::info!("WETH DETECTED");
             // if format_hex(log.address()) == WRAPPED_ETH_ADDRESS.to_lowercase() && log.log.topics.len() == 3 {
                 let topic_0 = format_hex(&log.log.topics[0]);
                 // then get the topics from that log
                     if topic_0 == TRANSFER_EVENT_SIGNATURE {
                         let padded_topic_2 = &log.log.topics[2];
-                        let topic_2 = format_hex(&padded_topic_2[24..]);
-                        substreams::log::info!("topic 2: {:?}", topic_2);
+                        let topic_2 = format_hex(&padded_topic_2[12..]);
+                        // substreams::log::info!("topic 2: {:?}", topic_2);
                             // then if topic_2 from that log is going to the address of my sushi-pool
                         let sushi_pools = &pools.pools;
                         // the problem is with the line above, if the block has no sushi pools it fails
-                        if sushi_pools.len() > 1 {
+                        if !sushi_pools.is_empty() {
                             let sushi_pool = &sushi_pools[0];
                             let sushi_pool_address = &sushi_pool.pool;
                                 if topic_2 == *sushi_pool_address {
@@ -83,7 +84,8 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                                         weth_amount: String::from("0"),
                                     })
                                 } else {
-                                    substreams::log::info!("topic 2 is not the sushi pool address: {}");
+                                    substreams::log::info!("topic 2: {:?}", topic_2);
+                                    substreams::log::info!("pool address: {:?}", sushi_pool_address);
                                     None
                                 }
                         } else {
@@ -94,8 +96,7 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                         None
                     }
             } else {
-                // substreams::log::info!("log is not weth or the topics.len is not 3");
-                substreams::log::info!("log is not weth");
+                // substreams::log::info!("log is not weth");
                 None
             }
         })
