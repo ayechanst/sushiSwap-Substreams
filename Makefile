@@ -6,7 +6,7 @@ build:
 
 .PHONY: stream
 stream: build
-	substreams run -e $(ENDPOINT) substreams.yaml map_pools_created -s 14441173 -t +250
+	substreams run -e $(ENDPOINT) substreams.yaml map_sushi_weth_pools -s 18532170 -t +250
 
 .PHONY: protogen
 protogen:

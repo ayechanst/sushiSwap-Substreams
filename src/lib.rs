@@ -85,7 +85,7 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                                     None
                                 }
                         } else {
-                            substreams::log::info!("sushi_pool does not have at least 1 pool: {:?}", sushi_pools);
+                            // substreams::log::info!("sushi_pool does not have at least 1 pool: {:?}", sushi_pools);
                             None
                         }
                     } else {
