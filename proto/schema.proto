@@ -29,4 +29,5 @@ message SushiWethPool {
   string pool = 1;
   string topic_2 = 2;
   string wethAmount = 3;
+  string block_num = 4;
 }

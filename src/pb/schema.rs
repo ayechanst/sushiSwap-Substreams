@@ -44,5 +44,7 @@ pub struct SushiWethPool {
     pub topic_2: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
     pub weth_amount: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub block_num: ::prost::alloc::string::String,
 }
 // @@protoc_insertion_point(module)

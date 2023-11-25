@@ -4,6 +4,7 @@ mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools};
+use pb::sf::substreams::v1::Clock;
 use crate::pb::schema::{SushiWethPool, SushiWethPools};
 // use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
 use substreams::store::{StoreSetProto, StoreSet}; // for store pools minus StoreGetProto
@@ -57,7 +58,7 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
 }
 
 #[substreams::handlers::map]
-fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWethPools, substreams::errors::Error> {
+fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools, clock: Clock) -> Result<SushiWethPools, substreams::errors::Error> {
     let sushi_weth_pools = block
         .logs()
         .filter_map(|log| {
@@ -74,11 +75,12 @@ fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools) -> Result<SushiWet
                             let sushi_pool = &sushi_pools[0];
                             let sushi_pool_address = &sushi_pool.pool;
                                 if topic_2 == *sushi_pool_address {
+                                    let block_num = clock.number;
                                     Some(SushiWethPool {
                                         pool: sushi_pool_address.to_string(),
                                         topic_2,
                                         weth_amount: String::from("0"),
-                                        // we want the block
+                                        block_num: block_num.to_string(),
                                         // and listen to money going into that pool (WETH);
                                         // listen to the tx and events of those pools
                                     })
