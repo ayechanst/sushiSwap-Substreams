@@ -6,7 +6,7 @@ build:
 
 .PHONY: stream
 stream: build
-	substreams run -e $(ENDPOINT) substreams.yaml map_sushi_weth_pools -s 18532170 -t +250
+	substreams run -e $(ENDPOINT) substreams.yaml map_sushi_weth_pools -s 18971237 -t +250
 
 .PHONY: protogen
 protogen:
@@ -15,3 +15,7 @@ protogen:
 .PHONY: package
 package:
 	substreams pack ./substreams.yaml
+
+
+# a block for map_pools_created with a known pool creation
+# 	substreams run -e $(ENDPOINT) substreams.yaml map_pools_created -s 18532170 -t +250

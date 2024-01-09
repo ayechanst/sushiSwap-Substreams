@@ -115,10 +115,10 @@ fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
     }
 }
 
-#[substreams::handlers::map]
-fn map_pools_transactions(block: eth::v2::Block, pools: Pools) {
+// #[substreams::handlers::map]
+// fn map_pools_transactions(block: eth::v2::Block, pools: Pools) {
 
-}
+// }
 
 // #[substreams::handlers::map]
 // pub fn graph_out(

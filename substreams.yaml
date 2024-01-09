@@ -36,6 +36,7 @@ modules:
     output:
       type: proto:schema.SushiWethPools
 
+
   - name: store_pools_created
     kind: store
     initialBlock: 12287507
