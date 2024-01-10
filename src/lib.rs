@@ -4,8 +4,8 @@ mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools};
-use pb::sf::substreams::v1::Clock;
-use crate::pb::schema::{SushiWethPool, SushiWethPools};
+// use pb::sf::substreams::v1::Clock;
+// use crate::pb::schema::{SushiWethPool, SushiWethPools};
 // use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
 use substreams::store::{StoreSetProto, StoreSet}; // for store pools minus StoreGetProto
 use substreams::store::StoreNew; // for store pools
@@ -29,7 +29,7 @@ pub const TRANSFER_EVENT_SIGNATURE: &str = "0xddf252ad1be2c89b69c2b068fc378daa95
 // const START_BLOCK: u64 = 18532170;
 
 #[substreams::handlers::map]
-fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors::Error> {
+fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Error> {
     // make sure this is grabbing the right pools
     let pools = block
         .logs()
@@ -38,7 +38,19 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
             if format_hex(log.address()) == ADDRESS.to_lowercase() {
                 // this is the mapping part
                 if let Some(pool_creation) = PoolCreated::match_and_decode(log) {
-                    Some(pool_creation)
+                    let token0 = format_hex(&pool_creation.token0);
+                    let token1 = format_hex(&pool_creation.token1);
+                    if token0 == WRAPPED_ETH_ADDRESS.to_lowercase() || token1 == WRAPPED_ETH_ADDRESS.to_lowercase() {
+                        // then it means its a sushi weth pool
+                        // the pool itself also has events and logs
+                        substreams::log::info!("passed token0: {:?}", token0);
+                        substreams::log::info!("passed token1: {:?}", token1);
+                        Some(pool_creation)
+                    } else {
+                        substreams::log::info!("failed token0: {:?}", token0);
+                        substreams::log::info!("failed token1: {:?}", token1);
+                        None
+                        }
                 } else {
                     None
                 }
@@ -56,56 +68,6 @@ fn map_pools_created(block: eth::v2::Block) -> Result<Pools, substreams::errors:
 
     Ok(Pools { pools })
 }
-
-#[substreams::handlers::map]
-fn map_sushi_weth_pools (block: eth::v2::Block, pools: Pools, clock: Clock) -> Result<SushiWethPools, substreams::errors::Error> {
-    let sushi_weth_pools = block
-        .logs()
-        .filter_map(|log| {
-            // if the log from the block is coming from the wrapped eth address
-            if format_hex(log.address()) == WRAPPED_ETH_ADDRESS.to_lowercase() {
-                let topic_0 = format_hex(&log.log.topics[0]);
-                // then get the topics from that log
-                    if topic_0 == TRANSFER_EVENT_SIGNATURE {
-                        let padded_topic_2 = &log.log.topics[2];
-                        let topic_2 = format_hex(&padded_topic_2[12..]);
-                        // then if topic_2 from that log is going to the address of my sushi-pool
-                        let sushi_pools = &pools.pools;
-                        if !sushi_pools.is_empty() {
-                            let sushi_pool = &sushi_pools[0];
-                            let sushi_pool_address = &sushi_pool.pool;
-                                if topic_2 == *sushi_pool_address {
-                                    let block_num = clock.number;
-                                    Some(SushiWethPool {
-                                        pool: sushi_pool_address.to_string(),
-                                        topic_2,
-                                        weth_amount: String::from("0"),
-                                        block_num: block_num.to_string(),
-                                        // and listen to money going into that pool (WETH);
-                                        // listen to the tx and events of those pools
-                                    })
-                                } else {
-                                    substreams::log::info!("topic 2: {:?}", topic_2);
-                                    substreams::log::info!("pool address: {:?}", sushi_pool_address);
-                                    None
-                                }
-                        } else {
-                            // substreams::log::info!("sushi_pool does not have at least 1 pool: {:?}", sushi_pools);
-                            None
-                        }
-                    } else {
-                        None
-                    }
-            } else {
-                // substreams::log::info!("log is not weth");
-                None
-            }
-        })
-        .collect::<Vec<SushiWethPool>>();
-
-    Ok(SushiWethPools { sushi_weth_pools })
-}
-
 
 #[substreams::handlers::store]
 fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
