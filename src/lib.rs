@@ -38,8 +38,6 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
                     let token0 = format_hex(&pool_creation.token0);
                     let token1 = format_hex(&pool_creation.token1);
                     if token0 == WRAPPED_ETH_ADDRESS.to_lowercase() || token1 == WRAPPED_ETH_ADDRESS.to_lowercase() {
-                        substreams::log::info!("passed token0: {:?}", token0);
-                        substreams::log::info!("passed token1: {:?}", token1);
                         Some(pool_creation)
                     } else {
                         None
