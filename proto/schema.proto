@@ -22,7 +22,7 @@ message Pool {
 }
 
 message TransferInfos {
-  repeated TransferInfo transferInfo = 1;
+  repeated TransferInfo transferInfos = 1;
 }
 
 message TransferInfo {
