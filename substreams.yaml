@@ -27,6 +27,15 @@ modules:
     output:
       type: proto:schema.Pools
 
+  - name: map_weth_transfers
+    kind: map
+    initialBlock: 12287507
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+      - map: map_weth_pools
+    output:
+      type: proto:schema.TransferInfos
+
   - name: store_pools_created
     kind: store
     initialBlock: 12287507
