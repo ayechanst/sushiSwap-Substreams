@@ -30,25 +30,18 @@ pub const TRANSFER_EVENT_SIGNATURE: &str = "0xddf252ad1be2c89b69c2b068fc378daa95
 
 #[substreams::handlers::map]
 fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Error> {
-    // make sure this is grabbing the right pools
     let pools = block
         .logs()
         .filter_map(|log| {
-            // this is the filtering part
             if format_hex(log.address()) == ADDRESS.to_lowercase() {
-                // this is the mapping part
                 if let Some(pool_creation) = PoolCreated::match_and_decode(log) {
                     let token0 = format_hex(&pool_creation.token0);
                     let token1 = format_hex(&pool_creation.token1);
                     if token0 == WRAPPED_ETH_ADDRESS.to_lowercase() || token1 == WRAPPED_ETH_ADDRESS.to_lowercase() {
-                        // then it means its a sushi weth pool
-                        // the pool itself also has events and logs
                         substreams::log::info!("passed token0: {:?}", token0);
                         substreams::log::info!("passed token1: {:?}", token1);
                         Some(pool_creation)
                     } else {
-                        substreams::log::info!("failed token0: {:?}", token0);
-                        substreams::log::info!("failed token1: {:?}", token1);
                         None
                         }
                 } else {
@@ -58,7 +51,6 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
                 None
             }
         })
-        // this is a different map doing something else
         .map(|pool_created| Pool {
             token_0: format_hex(&pool_created.token0),
             token_1: format_hex(&pool_created.token1),
