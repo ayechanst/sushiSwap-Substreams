@@ -3,12 +3,13 @@ mod uniswapv3factory;
 mod helpers;
 mod pb;
 
-use pb::schema::{Pool, Pools};
+use pb::schema::{Pool, Pools, TransferInfo, TransferInfos };
 // use pb::sf::substreams::v1::Clock;
 // use crate::pb::schema::{SushiWethPool, SushiWethPools};
 // use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
 use substreams::store::{StoreSetProto, StoreSet}; // for store pools minus StoreGetProto
-use substreams::store::StoreNew; // for store pools
+use substreams::store::StoreNew;
+// for store pools
 use substreams_ethereum::{pb::eth, Event};
 // use substreams_ethereum::pb::eth;
 
@@ -62,8 +63,28 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
 }
 
 #[substreams::handlers::map]
-fn map_weth_transfers(block: eth::v2::Block, pools: Pools) -> Result<TransferInfo, substreams::errors::Error> {
-
+fn map_weth_transfers(block: eth::v2::Block, pools: Pools) -> Result<TransferInfos, substreams::errors::Error> {
+    let transfer_infos = block
+        .calls()
+        .filter_map(|callview| {
+            if format_hex(&callview.transaction.from) == WRAPPED_ETH_ADDRESS.to_lowercase() &&
+                format_hex(&callview.transaction.to) == pools.pools[0].pool {
+                    if let Some(transfer) = &callview.transaction.value {
+                        Some(TransferInfo {
+                            pool: pools.pools[0].pool,
+                            from: format_hex(&callview.transaction.from),
+                            to: format_hex(&callview.transaction.to),
+                            amount: callview.transaction.value,
+                        })
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+        })
+        .collect::<Vec<TransferInfo>>();
+    Ok(TransferInfos { transfer_infos })
 }
 
 #[substreams::handlers::store]
