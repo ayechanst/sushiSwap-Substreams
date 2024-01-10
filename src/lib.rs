@@ -26,6 +26,7 @@ use uniswapv3factory::events::PoolCreated;
 pub const ADDRESS: &str = "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F";
 pub const WRAPPED_ETH_ADDRESS: &str = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 pub const TRANSFER_EVENT_SIGNATURE: &str = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+pub const SWAP_EVENT_SIGNATURE: &str = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67";
 // const START_BLOCK: u64 = 18532170;
 
 #[substreams::handlers::map]
@@ -38,6 +39,7 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
                     let token0 = format_hex(&pool_creation.token0);
                     let token1 = format_hex(&pool_creation.token1);
                     if token0 == WRAPPED_ETH_ADDRESS.to_lowercase() || token1 == WRAPPED_ETH_ADDRESS.to_lowercase() {
+                        let value = &pool_creation.pool;
                         Some(pool_creation)
                     } else {
                         None
@@ -57,6 +59,11 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
         .collect::<Vec<Pool>>();
 
     Ok(Pools { pools })
+}
+
+#[substreams::handlers::map]
+fn map_weth_transfers(block: eth::v2::Block, pools: Pools) -> Result<TransferInfo, substreams::errors::Error> {
+
 }
 
 #[substreams::handlers::store]
