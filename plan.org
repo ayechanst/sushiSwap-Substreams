@@ -1,0 +1,9 @@
+sushi swap plan
+
+* Map WETH pools
+1. finds logs from sushi swap
+2. finds pools from PoolCreated event
+3. if either token in the pool is WETH
+   returns the pool
+* Map WETH transfers
+1.
