@@ -14,3 +14,10 @@ sushi swap plan
 6. if the transactions came form WETH *and* went to the pool address
 7. get the transacttion value
 8. make the protobuf
+
+* Store pools
+
+* Problems
+- the problem is with line "if &format_hex(&callview.transaction.from) == pool_address"
+  - either callview.transaction.from isn't good,
+  - or pool_address is wrong

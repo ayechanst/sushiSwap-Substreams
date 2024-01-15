@@ -63,20 +63,19 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
     Ok(Pools { pools })
 }
 
+
+
 #[substreams::handlers::map]
 fn map_weth_transfers(block: eth::v2::Block, pools: Pools) -> Result<TransferInfos, substreams::errors::Error> {
     let pools_length = &pools.pools.len();
     if pools_length > &0 {
-        substreams::log::info!("pool length: {:?}", pools_length);
         let transfer_infos = block
             .calls()
             .filter_map(|callview| {
                 let pool_address = &pools.pools[0].pool;
-                // substreams::log::info!("pool address: {:?}", pool_address);
-                if &format_hex(&callview.transaction.from) == pool_address
-                    // && &format_hex(&callview.transaction.to) == pool_address
-                {
-                        if let Some(value) = &callview.transaction.value {
+                substreams::log::info!("to address: {:?}", format_hex(&callview.transaction.to));
+                if &format_hex(&callview.transaction.from) == pool_address {
+                        if let Some(value) = &callview.call.value {
                             Some(TransferInfo {
                                 pool: pools.pools[0].pool.to_string(),
                                 from: format_hex(&callview.transaction.from),
