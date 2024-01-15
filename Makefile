@@ -6,7 +6,7 @@ build:
 
 .PHONY: stream
 stream: build
-	substreams run -e $(ENDPOINT) substreams.yaml map_weth_transfers -s 18532170 -t +250
+	substreams run -e $(ENDPOINT) substreams.yaml map_weth_transfers -s 18532170 -t +5
 
 .PHONY: protogen
 protogen:

@@ -6,4 +6,11 @@ sushi swap plan
 3. if either token in the pool is WETH
    returns the pool
 * Map WETH transfers
-1.
+1. counts the amount of pools in the pools protobuf
+2. if there is at least one pool
+3. look at the calls
+4. look at the callview
+5. get the address of the first pool in the vector
+6. if the transactions came form WETH *and* went to the pool address
+7. get the transacttion value
+8. make the protobuf
