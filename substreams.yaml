@@ -27,6 +27,14 @@ modules:
     output:
       type: proto:schema.Pools
 
+  - name: store_pools
+    kind: store
+    initialBlock: 12287507
+    updatePolicy: set
+    valueType: proto:{Pools}
+    inputs:
+      - map: map_weth_pools
+
   - name: map_weth_transfers
     kind: map
     initialBlock: 12287507

@@ -4,31 +4,23 @@ mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools, TransferInfo, TransferInfos };
-// use pb::sf::substreams::v1::Clock;
-// use crate::pb::schema::{SushiWethPool, SushiWethPools};
 // use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
 use substreams::store::{StoreSetProto, StoreSet}; // for store pools minus StoreGetProto
 use substreams::store::StoreNew;
 // for store pools
 use substreams_ethereum::{pb::eth, Event};
 use substreams::scalar::BigInt;
-// use substreams_ethereum::pb::eth;
 
 use helpers::*;
 use uniswapv3factory::events::PoolCreated;
 
-// from substreams scaffolding
-// use erc721::events::{Approval as ApprovalEvent, Transfer as TransferEvent};
-
 // for db_out or graph_out
 // use substreams::pb::substreams::Clock;
 // use substreams_entity_change::{pb::entity::EntityChanges, tables::Tables};
-//
 
 pub const ADDRESS: &str = "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F";
 pub const WRAPPED_ETH_ADDRESS: &str = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 pub const TRANSFER_EVENT_SIGNATURE: &str = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-pub const SWAP_EVENT_SIGNATURE: &str = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67";
 // const START_BLOCK: u64 = 18532170;
 
 #[substreams::handlers::map]
@@ -63,7 +55,14 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
     Ok(Pools { pools })
 }
 
-
+#[substreams::handlers::store]
+fn store_pools(pools: Pools, store: StoreSetProto<Pools>) {
+    for pool in pools.pools {
+        let key = format!("pool:{}", pool.pool);
+        store.set(0, &key, &pools)
+            // figure out how to use store.set and what arguments it takes
+    }
+}
 
 #[substreams::handlers::map]
 fn map_weth_transfers(block: eth::v2::Block, pools: Pools) -> Result<TransferInfos, substreams::errors::Error> {
@@ -97,13 +96,13 @@ fn map_weth_transfers(block: eth::v2::Block, pools: Pools) -> Result<TransferInf
     }
 }
 
-#[substreams::handlers::store]
-fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
-    for pool in pools.pools {
-        let key = format!("pool:{}", pool.pool);
-        store.set(0, &key, &pool)
-    }
-}
+// #[substreams::handlers::store]
+// fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
+//     for pool in pools.pools {
+//         let key = format!("pool:{}", pool.pool);
+//         store.set(0, &key, &pool)
+//     }
+// }
 
 // #[substreams::handlers::map]
 // fn map_pools_transactions(block: eth::v2::Block, pools: Pools) {
