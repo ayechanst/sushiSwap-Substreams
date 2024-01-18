@@ -57,10 +57,9 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
 
 #[substreams::handlers::store]
 fn store_pools(pools: Pools, store: StoreSetProto<Pools>) {
-    for pool in pools.pools {
+    for pool in &pools.pools {
         let key = format!("pool:{}", pool.pool);
         store.set(0, &key, &pools)
-            // figure out how to use store.set and what arguments it takes
     }
 }
 
