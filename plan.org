@@ -12,10 +12,14 @@ sushi swap plan
 4. look at the callview
 5. get the address of the first pool in the vector
 6. if the transactions came form WETH *and* went to the pool address
-7. get the transacttion value
-8. make the protobuf
+7. get_at
+8. get the transaction value
+9. make the protobuf
 
 * Store pools
+Stores aggregates data as the substreams run. map modules run on each block
+but the store will remember what it finds, unlike the maps that forget.
+*
 
 * Problems
 - the problem is with line "if &format_hex(&callview.transaction.from) == pool_address"

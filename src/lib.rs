@@ -4,8 +4,7 @@ mod helpers;
 mod pb;
 
 use pb::schema::{Pool, Pools, TransferInfo, TransferInfos };
-// use substreams::store::{StoreSetProto, StoreSet, StoreGetProto}; // for store pools
-use substreams::store::{StoreSetProto, StoreSet}; // for store pools minus StoreGetProto
+use substreams::store::{StoreSetProto, StoreSet, StoreGetProto};
 use substreams::store::StoreNew;
 // for store pools
 use substreams_ethereum::{pb::eth, Event};
@@ -58,41 +57,48 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
 #[substreams::handlers::store]
 fn store_pools(pools: Pools, store: StoreSetProto<Pools>) {
     for pool in &pools.pools {
-        let key = format!("pool:{}", pool.pool);
+        let key = &pool.pool;
         store.set(0, &key, &pools)
     }
 }
 
 #[substreams::handlers::map]
-fn map_weth_transfers(block: eth::v2::Block, pools: Pools) -> Result<TransferInfos, substreams::errors::Error> {
-    let pools_length = &pools.pools.len();
-    if pools_length > &0 {
+fn map_weth_transfers(block: eth::v2::Block, store: StoreGetProto<Pools>) -> Result<TransferInfos, substreams::errors::Error> {
+    // let pools_length = &pools.pools.len();
+    // if pools_length > &0 {
         let transfer_infos = block
             .calls()
             .filter_map(|callview| {
-                let pool_address = &pools.pools[0].pool;
-                substreams::log::info!("to address: {:?}", format_hex(&callview.transaction.to));
-                if &format_hex(&callview.transaction.from) == pool_address {
-                        if let Some(value) = &callview.call.value {
-                            Some(TransferInfo {
-                                pool: pools.pools[0].pool.to_string(),
-                                from: format_hex(&callview.transaction.from),
-                                to: format_hex(&callview.transaction.to),
-                                amount: BigInt::from_unsigned_bytes_be(&value.bytes).to_string(),
-                            })
-                        } else {
-                            None
+                // let pool_address = &pools.pools[0].pool;
+                if (&format_hex(&callview.transaction.from) == pool_address) ||
+                    // make separate checks for these
+                    (&format_hex(&callview.transaction.to) == pool_address) {
+                        let fromAddress = format_hex(&callview.transaction.from);
+                        let toAddress = format_hex(&callview.transaction.to);
+                        if store.has_at(0, fromAddress) || store.has_at(0, toAddress) {
+
                         }
+                    // find tokens going in and out
+                    if let Some(value) = &callview.call.value {
+                        Some(TransferInfo {
+                            pool: pools.pools[0].pool.to_string(),
+                            from: format_hex(&callview.transaction.from),
+                            to: format_hex(&callview.transaction.to),
+                            amount: BigInt::from_unsigned_bytes_be(&value.bytes).to_string(),
+                        })
                     } else {
                         None
                     }
+                } else {
+                    None
+                }
             })
         .collect::<Vec<TransferInfo>>();
     Ok(TransferInfos { transfer_infos })
-    } else {
-        substreams::log::info!("pool length: {:?}", pools_length);
-        Ok(TransferInfos { transfer_infos: Vec::new() })
-    }
+    // } else {
+    //     substreams::log::info!("pool length: {:?}", pools_length);
+    //     Ok(TransferInfos { transfer_infos: Vec::new() })
+    // }
 }
 
 // #[substreams::handlers::store]
