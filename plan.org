@@ -10,11 +10,10 @@ sushi swap plan
 2. if there is at least one pool
 3. look at the calls
 4. look at the callview
-5. get the address of the first pool in the vector
-6. if the transactions came form WETH *and* went to the pool address
-7. get_at
-8. get the transaction value
-9. make the protobuf
+5. check if a my store pool has a transaction.from
+6. if so populate protobuf
+7. check if a my store pool has a transaction.to
+8. if so populate protobug
 
 * Store pools
 Stores aggregates data as the substreams run. map modules run on each block
