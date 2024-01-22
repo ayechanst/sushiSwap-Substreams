@@ -69,13 +69,29 @@ fn map_weth_transfers(block: eth::v2::Block, store: StoreGetProto<Pools>) -> Res
         let transfer_infos = block
             .calls()
             .filter_map(|callview| {
+                let pool_address;
                 let tx_from_address = format_hex(&callview.transaction.from);
                 let tx_to_address = format_hex(&callview.transaction.to);
-                if store.has_at(0, tx_from_address) || store.has_at(0, tx_to_address) {
-                    // TODO: let pool_address = ???
+                if store.has_at(0, tx_from_address) {
+                    pool_address = tx_from_address;
                     if let Some(value) = &callview.call.value {
                         Some(TransferInfo {
-                            // TODO: pool:
+                        pool: pool_address,
+                        from: format_hex(&callview.transaction.from),
+                        to: format_hex(&callview.transaction.to),
+                        amount: BigInt::from_unsigned_bytes_be(&value.bytes).to_string(),
+                        })
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+                if store.has_at(0, tx_to_address) {
+                    pool_address = tx_from_address;
+                    if let Some(value) = &callview.call.value {
+                        Some(TransferInfo {
+                            pool: pool_address,
                             from: format_hex(&callview.transaction.from),
                             to: format_hex(&callview.transaction.to),
                             amount: BigInt::from_unsigned_bytes_be(&value.bytes).to_string(),
