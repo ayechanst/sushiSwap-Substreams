@@ -58,7 +58,7 @@ fn map_weth_pools(block: eth::v2::Block) -> Result<Pools, substreams::errors::Er
 fn store_pools(pools: Pools, store: StoreSetProto<Pools>) {
     for pool in &pools.pools {
         let key = &pool.pool;
-        store.set(0, &key, &pools)
+        store.set(0, key, &pools)
     }
 }
 
@@ -71,30 +71,15 @@ fn map_weth_transfers(block: eth::v2::Block, store: StoreGetProto<Pools>) -> Res
             .filter_map(|callview| {
                 let pool_address;
                 let tx_from_address = format_hex(&callview.transaction.from);
-                let tx_to_address = format_hex(&callview.transaction.to);
-                if store.has_at(0, tx_from_address) {
-                    pool_address = tx_from_address;
+                // let tx_to_address = format_hex(&callview.transaction.to);
+                if store.has_at(0, &tx_from_address) {
+                    pool_address = &tx_from_address;
                     if let Some(value) = &callview.call.value {
                         Some(TransferInfo {
-                        pool: pool_address,
+                        pool: pool_address.to_string(),
                         from: format_hex(&callview.transaction.from),
                         to: format_hex(&callview.transaction.to),
                         amount: BigInt::from_unsigned_bytes_be(&value.bytes).to_string(),
-                        })
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                }
-                if store.has_at(0, tx_to_address) {
-                    pool_address = tx_from_address;
-                    if let Some(value) = &callview.call.value {
-                        Some(TransferInfo {
-                            pool: pool_address,
-                            from: format_hex(&callview.transaction.from),
-                            to: format_hex(&callview.transaction.to),
-                            amount: BigInt::from_unsigned_bytes_be(&value.bytes).to_string(),
                         })
                     } else {
                         None
@@ -111,18 +96,21 @@ fn map_weth_transfers(block: eth::v2::Block, store: StoreGetProto<Pools>) -> Res
     // }
 }
 
-// #[substreams::handlers::store]
-// fn store_pools_created(pools: Pools, store: StoreSetProto<Pool>) {
-//     for pool in pools.pools {
-//         let key = format!("pool:{}", pool.pool);
-//         store.set(0, &key, &pool)
-//     }
-// }
-
-// #[substreams::handlers::map]
-// fn map_pools_transactions(block: eth::v2::Block, pools: Pools) {
-
-// }
+                // if store.has_at(0, tx_to_address) {
+                //     pool_address = tx_from_address;
+                //     if let Some(value) = &callview.call.value {
+                //         Some(TransferInfo {
+                //             pool: pool_address,
+                //             from: format_hex(&callview.transaction.from),
+                //             to: format_hex(&callview.transaction.to),
+                //             amount: BigInt::from_unsigned_bytes_be(&value.bytes).to_string(),
+                //         })
+                //     } else {
+                //         None
+                //     }
+                // } else {
+                //     None
+                // }
 
 // #[substreams::handlers::map]
 // pub fn graph_out(
@@ -131,15 +119,11 @@ fn map_weth_transfers(block: eth::v2::Block, store: StoreGetProto<Pools>) -> Res
 //     approvals: Approvals,
 // ) -> Result<EntityChanges, substreams::errors::Error> {
 //     let mut tables = Tables::new();
-
 //     if clock.number == START_BLOCK {
 //         // Create the collection, we only need to do this once
 //         tables.create_row("Collection", ADDRESS.to_string());
 //     }
-
 //     transfers_to_table_changes(&mut tables, &transfers);
-
 //     approvals_to_table_changes(&mut tables, &approvals);
-
 //     Ok(tables.to_entity_changes())
 // }
