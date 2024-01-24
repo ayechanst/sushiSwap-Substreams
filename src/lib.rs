@@ -71,11 +71,11 @@ fn map_weth_transfers(block: eth::v2::Block, store: StoreGetProto<Pools>) -> Res
             .filter_map(|callview| {
                 let tx_from_address = format_hex(&callview.transaction.from);
                 // let tx_to_address = format_hex(&callview.transaction.to);
-                if let Some(pool_transfer) = store.get_at(0, &tx_from_address) {
-                    let pool_address = pool_transfer;
+                if let Some(transfer_from_pool) = store.get_at(0, tx_from_address) {
+                    // let pool_address = transfer_from_pool;
                     if let Some(value) = &callview.call.value {
                         Some(TransferInfo {
-                        pool: pool_address.to_string(),
+                        pool: transfer_from_pool.pools[0].pool.to_string(),
                         from: format_hex(&callview.transaction.from),
                         to: format_hex(&callview.transaction.to),
                         amount: BigInt::from_unsigned_bytes_be(&value.bytes).to_string(),
